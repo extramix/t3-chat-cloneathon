@@ -38,6 +38,8 @@ export async function POST(req: Request) {
     const result = await streamText({
       model: selectedModel,
       messages,
+    //   maxTokens: 1000,
+    //   temperature: 0.7,
     })
 
     return result.toDataStreamResponse()
@@ -58,3 +60,5 @@ export async function POST(req: Request) {
     )
   }
 } 
+
+export const runtime = 'edge'

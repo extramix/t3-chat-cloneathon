@@ -21,6 +21,8 @@ export interface Chat {
   isStreaming?: boolean
 }
 
+export const dynamic = "force-dynamic"
+
 export default function HomePage() {
   const [chats, setChats] = useState<Chat[]>([])
   const [activeChat, setActiveChat] = useState<string | null>(null)
