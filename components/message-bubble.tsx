@@ -4,6 +4,7 @@ import { memo } from "react"
 import { User, Bot } from "lucide-react"
 import { CodeBlock } from "@/components/code-block"
 import type { Message } from "ai"
+import Markdown from "react-markdown"
 
 interface MessageBubbleProps {
   message: Message
@@ -64,7 +65,7 @@ export const MessageBubble = memo(function MessageBubble({ message, isStreaming 
             {contentParts.map((part, index) => (
               <div key={index}>
                 {part.type === "text" ? (
-                  <div className="whitespace-pre-wrap">{part.content}</div>
+                  <div className="whitespace-pre-wrap"><Markdown>{part.content}</Markdown></div>
                 ) : (
                   <CodeBlock language={part.language || "text"} code={part.content} />
                 )}

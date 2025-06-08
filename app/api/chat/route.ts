@@ -58,6 +58,7 @@ export async function POST(req: NextRequest) {
     const selectedModel = google(modelName)
 
     const result = await streamText({
+      system: 'Write about the given topic. Markdown is supported. Use headings wherever appropriate.',
       model: selectedModel,
       messages: body.messages,
       temperature: 0.7,
