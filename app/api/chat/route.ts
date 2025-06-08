@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     let selectedModel
     
     switch (model) {
-            case 'gemini-2.5-flash-preview-05-20':
+      case 'gemini-2.5-flash-preview-05-20':
         if (!googleApiKey) {
           return new Response(
             JSON.stringify({ error: 'Google API key not configured. Please set GOOGLE_GENERATIVE_AI_API_KEY in your environment variables.' }),
@@ -26,11 +26,11 @@ export async function POST(req: Request) {
         break
       default:
         if (!googleApiKey) {
-            return new Response(
-              JSON.stringify({ error: 'Google API key not configured. Please set GOOGLE_GENERATIVE_AI_API_KEY in your environment variables.' }),
-              { status: 400, headers: { 'Content-Type': 'application/json' } }
-            )
-          }
+          return new Response(
+            JSON.stringify({ error: 'Google API key not configured. Please set GOOGLE_GENERATIVE_AI_API_KEY in your environment variables.' }),
+            { status: 400, headers: { 'Content-Type': 'application/json' } }
+          )
+        }
         selectedModel = google('gemini-2.5-flash-preview-05-20')
         break
     }
@@ -38,8 +38,7 @@ export async function POST(req: Request) {
     const result = await streamText({
       model: selectedModel,
       messages,
-    //   maxTokens: 1000,
-    //   temperature: 0.7,
+      temperature: 0.7,
     })
 
     return result.toDataStreamResponse()

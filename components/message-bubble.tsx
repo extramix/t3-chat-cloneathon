@@ -1,5 +1,6 @@
 "use client"
 
+import { memo } from "react"
 import { User, Bot } from "lucide-react"
 import { CodeBlock } from "@/components/code-block"
 import type { Message } from "ai"
@@ -9,7 +10,7 @@ interface MessageBubbleProps {
   isStreaming?: boolean
 }
 
-export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
+export const MessageBubble = memo(function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
   const isUser = message.role === "user"
 
   // Parse message content to handle code blocks
@@ -65,7 +66,7 @@ export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
                 {part.type === "text" ? (
                   <div className="whitespace-pre-wrap">{part.content}</div>
                 ) : (
-                  <CodeBlock language={part.language} code={part.content} />
+                  <CodeBlock language={part.language || "text"} code={part.content} />
                 )}
               </div>
             ))}
@@ -87,4 +88,4 @@ export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
       )}
     </div>
   )
-}
+})
