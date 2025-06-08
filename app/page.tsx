@@ -4,8 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import { Sidebar } from "@/components/sidebar"
 import { ChatInterface } from "@/components/chat-interface"
 import { ThemeProvider } from "@/components/theme-provider"
-import { Toaster } from "sonner"
-import { toast } from "sonner"
+import { Toaster } from "@/components/ui/sonner"
 
 export interface Chat {
   id: string
