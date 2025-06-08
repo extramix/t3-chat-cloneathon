@@ -10,11 +10,12 @@ interface ModelSelectorProps {
 }
 
 const models = [
-  { id: "gpt-4o", name: "GPT-4o", provider: "OpenAI" },
-  { id: "gpt-4o-mini", name: "GPT-4o Mini", provider: "OpenAI" },
-  { id: "gpt-3.5-turbo", name: "GPT-3.5 Turbo", provider: "OpenAI" },
-  { id: "claude-3-5-sonnet-20241022", name: "Claude 3.5 Sonnet", provider: "Anthropic" },
-  { id: "claude-3-haiku-20240307", name: "Claude 3 Haiku", provider: "Anthropic" },
+  { id: "gemini-2.5-flash-preview-05-20", name: "Gemini 2.5 Flash", provider: "Google" },
+  // { id: "gpt-4o", name: "GPT-4o", provider: "OpenAI" },
+  // { id: "gpt-4o-mini", name: "GPT-4o Mini", provider: "OpenAI" },
+  // { id: "gpt-3.5-turbo", name: "GPT-3.5 Turbo", provider: "OpenAI" },
+  // { id: "claude-3-5-sonnet-20241022", name: "Claude 3.5 Sonnet", provider: "Anthropic" },
+  // { id: "claude-3-haiku-20240307", name: "Claude 3 Haiku", provider: "Anthropic" },
 ]
 
 export function ModelSelector({ value, onChange }: ModelSelectorProps) {

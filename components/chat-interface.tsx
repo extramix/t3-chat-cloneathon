@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { ModelSelector } from "@/components/model-selector"
 import { MessageBubble } from "@/components/message-bubble"
-import { useChat } from "ai/react"
+import { useChat } from "@ai-sdk/react"
 import type { Chat } from "@/app/page"
 import { toast } from "sonner"
 
@@ -34,6 +34,21 @@ export function ChatInterface({ chat, onUpdateChat }: ChatInterfaceProps) {
       role: msg.role,
       content: msg.content,
     })),
+    onError: (error) => {
+      console.error('Chat error:', error)
+      // Try to parse the error message
+      try {
+        const errorData = JSON.parse(error.message)
+        toast.error(errorData.error || 'Failed to send message. Please try again.')
+      } catch {
+        // If it's not JSON, show the raw error or a generic message
+        if (error.message.includes('API key')) {
+          toast.error('API key not configured. Please check your environment variables.')
+        } else {
+          toast.error('Failed to send message. Please try again.')
+        }
+      }
+    },
   })
 
   // Auto-scroll to bottom when messages change
