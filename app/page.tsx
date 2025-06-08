@@ -5,6 +5,7 @@ import { Sidebar } from "@/components/sidebar"
 import { ChatInterface } from "@/components/chat-interface"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
+import { toast } from "sonner"
 
 export interface Chat {
   id: string
