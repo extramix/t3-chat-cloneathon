@@ -44,6 +44,7 @@ export function useChatManagement({ chat, onUpdateChat }: UseChatManagementProps
     },
   })
 
+  //FIXME: This is where I assumed make the streaming bad. Need to fix soon.
   // Debounced update function for smoother streaming
   const debouncedUpdate = useCallback((updates: Partial<Chat>, immediate = false) => {
     if (updateTimeoutRef.current) {

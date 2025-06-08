@@ -6,6 +6,7 @@ import { ChatInterface } from "@/components/chat-interface"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 import { toast } from "sonner"
+import { SUPPORTED_MODELS } from "./models-constants"
 
 export interface Chat {
   id: string
@@ -35,6 +36,8 @@ export default function HomePage() {
       try {
         const parsedChats = JSON.parse(savedChats).map((chat: any) => ({
           ...chat,
+          // Migrate any unsupported models to Gemini
+          model: chat.model === SUPPORTED_MODELS.GEMINI_FLASH ? chat.model : SUPPORTED_MODELS.GEMINI_FLASH,
           createdAt: new Date(chat.createdAt),
           messages: chat.messages.map((msg: any) => ({
             ...msg,
@@ -65,7 +68,7 @@ export default function HomePage() {
       id: newChatId,
       title: "New Chat",
       messages: [],
-      model: "gpt-4o",
+      model: SUPPORTED_MODELS.GEMINI_FLASH,
       createdAt: new Date(),
     }
 

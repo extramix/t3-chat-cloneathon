@@ -1,63 +1,83 @@
-import { openai } from '@ai-sdk/openai'
-import { anthropic } from '@ai-sdk/anthropic'
 import { google } from '@ai-sdk/google'
 import { streamText } from 'ai'
+import { NextRequest } from 'next/server'
+import { SUPPORTED_MODELS, type SupportedModel } from '@/app/models-constants'
 
-export async function POST(req: Request) {
-  try {
-    const { messages, model } = await req.json()
+interface ChatMessage {
+  role: 'user' | 'assistant' | 'system'
+  content: string
+}
 
-    // Check for required API keys
-    // const openaiApiKey = process.env.OPENAI_API_KEY
-    // const anthropicApiKey = process.env.ANTHROPIC_API_KEY
-    const googleApiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY
+interface ChatRequest {
+  messages: ChatMessage[]
+  model?: string
+}
 
-    let selectedModel
-    
-    switch (model) {
-      case 'gemini-2.5-flash-preview-05-20':
-        if (!googleApiKey) {
-          return new Response(
-            JSON.stringify({ error: 'Google API key not configured. Please set GOOGLE_GENERATIVE_AI_API_KEY in your environment variables.' }),
-            { status: 400, headers: { 'Content-Type': 'application/json' } }
-          )
-        }
-        selectedModel = google('gemini-2.5-flash-preview-05-20')
-        break
-      default:
-        if (!googleApiKey) {
-          return new Response(
-            JSON.stringify({ error: 'Google API key not configured. Please set GOOGLE_GENERATIVE_AI_API_KEY in your environment variables.' }),
-            { status: 400, headers: { 'Content-Type': 'application/json' } }
-          )
-        }
-        selectedModel = google('gemini-2.5-flash-preview-05-20')
-        break
+
+function createErrorResponse(message: string, status: number) {
+  return new Response(
+    JSON.stringify({ error: message }),
+    { 
+      status, 
+      headers: { 'Content-Type': 'application/json' } 
     }
+  )
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const body: ChatRequest = await req.json()
+    
+    if (!body.messages || !Array.isArray(body.messages) || body.messages.length === 0) {
+      return createErrorResponse('Messages array is required and cannot be empty', 400)
+    }
+
+    for (const message of body.messages) {
+      if (!message.role || !message.content) {
+        return createErrorResponse('Each message must have role and content', 400)
+      }
+      if (!['user', 'assistant', 'system'].includes(message.role)) {
+        return createErrorResponse('Invalid message role', 400)
+      }
+    }
+
+    const googleApiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY
+    if (!googleApiKey) {
+      return createErrorResponse(
+        'Google API key not configured. Please set GOOGLE_GENERATIVE_AI_API_KEY in your environment variables.',
+        500
+      )
+    }
+
+    const modelName = (body.model as SupportedModel) || SUPPORTED_MODELS.GEMINI_FLASH
+    
+    if (modelName !== SUPPORTED_MODELS.GEMINI_FLASH) {
+      return createErrorResponse(`Unsupported model: ${modelName}`, 400)
+    }
+
+    const selectedModel = google(modelName)
 
     const result = await streamText({
       model: selectedModel,
-      messages,
+      messages: body.messages,
       temperature: 0.7,
     })
 
     return result.toDataStreamResponse()
+    
   } catch (error) {
     console.error('Chat API error:', error)
     
-    // Check if it's an API key related error
-    if (error instanceof Error && error.message.includes('api key')) {
-      return new Response(
-        JSON.stringify({ error: 'Invalid API key. Please check your API key configuration.' }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } }
-      )
+    if (error instanceof SyntaxError) {
+      return createErrorResponse('Invalid JSON in request body', 400)
     }
     
-    return new Response(
-      JSON.stringify({ error: 'Internal server error. Please try again later.' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    )
+    if (error instanceof Error && error.message.toLowerCase().includes('api key')) {
+      return createErrorResponse('Invalid API key. Please check your API key configuration.', 401)
+    }
+    
+    return createErrorResponse('Internal server error. Please try again later.', 500)
   }
-} 
+}
 
 export const runtime = 'edge'
