@@ -72,7 +72,9 @@ export function Sidebar({
 
   const handleChatSelect = (chatId: string) => {
     // Immediately update the UI optimistically
-    setOptimisticActiveChat(chatId)
+    startTransition(() => {
+      setOptimisticActiveChat(chatId)
+    })
 
     // Defer the actual chat loading to avoid blocking the UI
     startTransition(() => {
@@ -101,7 +103,6 @@ export function Sidebar({
         onClick={(e) => {
           e.stopPropagation()
           onDeleteChat(chat.id)
-          toast.success("Chat deleted")
         }}
       >
         <Trash2 className="h-3 w-3" />
@@ -163,7 +164,7 @@ export function Sidebar({
           {chatGroups.today.length > 0 && (
             <div>
               <h3 className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wider">Today</h3>
-              <div className="space-y-1">
+              <div className="py-2">
                 {chatGroups.today.map((chat) => (
                   <ChatItem key={chat.id} chat={chat} />
                 ))}
