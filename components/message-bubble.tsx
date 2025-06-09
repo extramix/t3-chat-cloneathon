@@ -60,7 +60,7 @@ export const MessageBubble = memo(function MessageBubble({ message, isStreaming 
       )}
 
       <div className={`flex-1 max-w-[80%] ${isUser ? "order-first" : ""}`}>
-        <div className={`rounded-lg p-4 ${isUser ? "bg-primary text-primary-foreground ml-auto" : "bg-muted"}`}>
+        <div className={`rounded-lg p-4 ${isUser && "bg-muted"}`}>
           <div className="space-y-3">
             {contentParts.map((part, index) => (
               <div key={index}>
@@ -82,11 +82,13 @@ export const MessageBubble = memo(function MessageBubble({ message, isStreaming 
         </div>
       </div>
 
-      {isUser && (
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-          <User className="h-4 w-4 text-primary-foreground" />
-        </div>
-      )}
-    </div>
+      {
+        isUser && (
+          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+            <User className="h-4 w-4 text-primary-foreground" />
+          </div>
+        )
+      }
+    </div >
   )
 })

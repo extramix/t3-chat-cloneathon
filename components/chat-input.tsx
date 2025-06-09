@@ -54,16 +54,16 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
         )
 
         return (
-            <div className="border-t border-border p-4">
+            <div className="pb-20 sticky bottom-0">
                 <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
-                    <div className="relative">
+                    <div className="relative bg-accent rounded-2xl opacity-95">
                         <Textarea
                             ref={textareaRef}
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             onKeyDown={handleKeyDown}
                             placeholder="Type your message here..."
-                            className="min-h-[60px] max-h-[200px] pr-12 resize-none"
+                            className="min-h-[80px] max-h-[200px] pl-5 pt-5 resize-none rounded-2xl"
                             disabled={isLoading}
                         />
                         <Button
