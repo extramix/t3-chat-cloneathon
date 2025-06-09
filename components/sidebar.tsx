@@ -90,9 +90,9 @@ export function Sidebar({
         <MessageSquare className="h-4 w-4 text-muted-foreground flex-shrink-0" />
         <span className="text-sm truncate">{chat.title}</span>
         {chat.isStreaming && <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse flex-shrink-0" />}
-        {isPending && optimisticActiveChat === chat.id && (
+        {/* {isPending && optimisticActiveChat === chat.id && (
           <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse flex-shrink-0" />
-        )}
+        )} */}
       </div>
       <Button
         variant="ghost"
