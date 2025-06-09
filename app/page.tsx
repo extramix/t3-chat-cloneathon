@@ -3,8 +3,6 @@
 import { useState, useEffect, useCallback } from "react"
 import { Sidebar } from "@/components/sidebar"
 import { ChatInterface } from "@/components/chat-interface"
-import { ThemeProvider } from "@/components/theme-provider"
-import { Toaster } from "@/components/ui/sonner"
 import { toast } from "sonner"
 import { SUPPORTED_MODELS } from "./models-constants"
 
@@ -106,37 +104,34 @@ export default function HomePage() {
   const currentChat = chats.find((chat) => chat.id === activeChat)
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-      <div className="flex h-screen bg-background">
-        <Sidebar
-          chats={chats}
-          activeChat={activeChat}
-          onChatSelect={handleChatSelect}
-          onNewChat={createNewChat}
-          onDeleteChat={deleteChat}
-          collapsed={sidebarCollapsed}
-          onToggleCollapse={handleToggleCollapse}
-        />
-        <main className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? "ml-16" : "ml-80"}`}>
-          {currentChat ? (
-            <ChatInterface key={currentChat.id} chat={currentChat} onUpdateChat={updateChat} />
-          ) : (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center">
-                <h1 className="text-2xl font-semibold mb-4">Welcome to T3.Chat</h1>
-                <p className="text-muted-foreground mb-6">Start a new conversation to begin</p>
-                <button
-                  onClick={createNewChat}
-                  className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
-                >
-                  New Chat
-                </button>
-              </div>
+    <div className="flex h-screen bg-background">
+      <Sidebar
+        chats={chats}
+        activeChat={activeChat}
+        onChatSelect={handleChatSelect}
+        onNewChat={createNewChat}
+        onDeleteChat={deleteChat}
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={handleToggleCollapse}
+      />
+      <main className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? "ml-16" : "ml-80"}`}>
+        {currentChat ? (
+          <ChatInterface key={currentChat.id} chat={currentChat} onUpdateChat={updateChat} />
+        ) : (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center">
+              <h1 className="text-2xl font-semibold mb-4">Welcome to T3.Chat</h1>
+              <p className="text-muted-foreground mb-6">Start a new conversation to begin</p>
+              <button
+                onClick={createNewChat}
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
+              >
+                New Chat
+              </button>
             </div>
-          )}
-        </main>
-      </div>
-      <Toaster />
-    </ThemeProvider>
+          </div>
+        )}
+      </main>
+    </div>
   )
 }
