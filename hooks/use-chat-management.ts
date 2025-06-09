@@ -24,26 +24,6 @@ export function useChatManagement({ chat, onUpdateChat }: UseChatManagementProps
     onError: handleChatError,
   })
 
-  // Sync messages back to chat state on every change - raw streaming
-  useEffect(() => {
-    if (messages.length > 0) {
-      const updatedMessages = messages.map((msg) => ({
-        id: msg.id,
-        role: msg.role as "user" | "assistant",
-        content: msg.content,
-        timestamp: new Date(),
-      }))
-
-      onUpdateChat(chat.id, {
-        messages: updatedMessages,
-        isStreaming: isLoading,
-      })
-    } else {
-      // Handle streaming status for empty chats
-      onUpdateChat(chat.id, { isStreaming: isLoading })
-    }
-  }, [messages, isLoading, chat.id, onUpdateChat])
-
   // Handle chat switching
   useEffect(() => {
     setMessages(chat.messages.map((msg) => ({
