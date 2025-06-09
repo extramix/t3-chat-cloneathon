@@ -3,23 +3,22 @@
 import { ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { getModelsByProvider } from "@/app/models-info"
 
 interface ModelSelectorProps {
   value: string
   onChange: (model: string) => void
 }
 
-const models = [
-  { id: "gemini-2.5-flash-preview-05-20", name: "Gemini 2.5 Flash", provider: "Google" },
-  // { id: "gpt-4o", name: "GPT-4o", provider: "OpenAI" },
-  // { id: "gpt-4o-mini", name: "GPT-4o Mini", provider: "OpenAI" },
-  // { id: "gpt-3.5-turbo", name: "GPT-3.5 Turbo", provider: "OpenAI" },
-  // { id: "claude-3-5-sonnet-20241022", name: "Claude 3.5 Sonnet", provider: "Anthropic" },
-  // { id: "claude-3-haiku-20240307", name: "Claude 3 Haiku", provider: "Anthropic" },
-]
+const googleModels = getModelsByProvider("Google")
+const openaiModels = getModelsByProvider("OpenAI")
+const anthropicModels = getModelsByProvider("Anthropic")
+const openrouterModels = getModelsByProvider("OpenRouter")
+
+const allModels = [...googleModels, ...openaiModels, ...anthropicModels, ...openrouterModels]
 
 export function ModelSelector({ value, onChange }: ModelSelectorProps) {
-  const selectedModel = models.find((model) => model.id === value) || models[0]
+  const selectedModel = allModels.find((model) => model.modelId === value) || googleModels[0]
 
   return (
     <DropdownMenu>
@@ -31,16 +30,43 @@ export function ModelSelector({ value, onChange }: ModelSelectorProps) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-64">
-        {models.map((model) => (
+        {googleModels.map((model) => (
           <DropdownMenuItem
-            key={model.id}
-            onClick={() => onChange(model.id)}
+            key={model.modelId}
+            onClick={() => onChange(model.modelId)}
             className="flex flex-col items-start space-y-1 p-3"
           >
             <div className="font-medium">{model.name}</div>
-            <div className="text-sm text-muted-foreground">{model.provider}</div>
           </DropdownMenuItem>
         ))}
+        {openrouterModels.map((model) => (
+          <DropdownMenuItem
+            key={model.modelId}
+            onClick={() => onChange(model.modelId)}
+            className="flex flex-col items-start space-y-1 p-3"
+          >
+            <div className="font-medium">{model.name}</div>
+          </DropdownMenuItem>
+        ))}
+        {openaiModels.map((model) => (
+          <DropdownMenuItem
+            key={model.modelId}
+            onClick={() => onChange(model.modelId)}
+            className="flex flex-col items-start space-y-1 p-3"
+          >
+            <div className="font-medium">{model.name}</div>
+          </DropdownMenuItem>
+        ))}
+        {anthropicModels.map((model) => (
+          <DropdownMenuItem
+            key={model.modelId}
+            onClick={() => onChange(model.modelId)}
+            className="flex flex-col items-start space-y-1 p-3"
+          >
+            <div className="font-medium">{model.name}</div>
+          </DropdownMenuItem>
+        ))}
+
       </DropdownMenuContent>
     </DropdownMenu>
   )
