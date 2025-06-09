@@ -2,7 +2,7 @@ import { useEffect, useCallback } from "react"
 import { useChat } from "@ai-sdk/react"
 import { toast } from "sonner"
 import type { Chat } from "@/app/pagey"
-import { handleChatError, validateMessageContent } from "@/lib/chat-utils"
+import { handleChatError, validateMessageContent, generateChatTitle } from "@/lib/chat-utils"
 
 interface UseChatManagementProps {
   chat: Chat
@@ -41,14 +41,24 @@ export function useChatManagement({ chat, onUpdateChat }: UseChatManagementProps
     }
 
     try {
+      // Check if this is the first user message and chat title is still "New Chat"
+      const isFirstMessage = chat.messages.length === 0 || 
+        (chat.title === "New Chat" && !chat.messages.some(msg => msg.role === "user"))
+
       await append({
         role: "user",
         content: content.trim(),
       })
+
+      // Auto-update chat title from first user message
+      if (isFirstMessage) {
+        const newTitle = generateChatTitle([{ role: "user", content: content.trim() }])
+        onUpdateChat(chat.id, { title: newTitle })
+      }
     } catch (error) {
       throw error
     }
-  }, [append])
+  }, [append, chat.id, chat.messages, chat.title, onUpdateChat])
 
   return {
     messages,
