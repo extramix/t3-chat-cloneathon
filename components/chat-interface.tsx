@@ -5,7 +5,7 @@ import { ModelSelector } from "@/components/model-selector"
 import { ChatMessages } from "@/components/chat-messages"
 import { ChatInput, type ChatInputRef } from "@/components/chat-input"
 import { useChatManagement } from "@/hooks/use-chat-management"
-import type { Chat } from "@/app/page"
+import type { Chat } from "@/app/pagey"
 
 interface ChatInterfaceProps {
   chat: Chat

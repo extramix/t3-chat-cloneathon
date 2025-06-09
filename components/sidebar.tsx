@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { ThemeToggle } from "@/components/theme-toggle"
-import type { Chat } from "@/app/page"
+import type { Chat } from "@/app/pagey"
 import { toast } from "sonner"
 
 interface SidebarProps {
@@ -70,9 +70,8 @@ export function Sidebar({
 
   const ChatItem = ({ chat }: { chat: Chat }) => (
     <div
-      className={`group flex items-center justify-between p-2 rounded-lg cursor-pointer hover:bg-accent/50 ${
-        activeChat === chat.id ? "bg-accent" : ""
-      }`}
+      className={`group flex items-center justify-between p-2 rounded-lg cursor-pointer hover:bg-accent/50 ${activeChat === chat.id ? "bg-accent" : ""
+        }`}
       onClick={() => onChatSelect(chat.id)}
     >
       <div className="flex items-center space-x-2 flex-1 min-w-0">

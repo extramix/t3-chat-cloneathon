@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useRef } from "react"
 import { useChat } from "@ai-sdk/react"
 import { toast } from "sonner"
-import type { Chat } from "@/app/page"
+import type { Chat } from "@/app/pagey"
 
 interface UseChatManagementProps {
   chat: Chat
