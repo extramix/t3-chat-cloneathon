@@ -1,87 +1,100 @@
-import { useEffect, useCallback, useRef } from "react"
+import { useEffect, useCallback, useRef, useMemo } from "react"
 import { useChat } from "@ai-sdk/react"
 import { toast } from "sonner"
 import type { Chat } from "@/app/pagey"
+import { handleChatError, generateChatTitle, validateMessageContent } from "@/lib/chat-utils"
 
 interface UseChatManagementProps {
   chat: Chat
   onUpdateChat: (chatId: string, updates: Partial<Chat>) => void
 }
 
-export function useChatManagement({ chat, onUpdateChat }: UseChatManagementProps) {
-  const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const lastUpdateRef = useRef<{ messagesLength: number; isLoading: boolean; lastMessageContent: string }>({
-    messagesLength: 0,
-    isLoading: false,
-    lastMessageContent: '',
-  })
+interface UpdateState {
+  messagesLength: number
+  isLoading: boolean
+  lastMessageContent: string
+}
 
-  const { messages, append, isLoading } = useChat({
+
+
+// Configuration constants
+const DEFAULT_UPDATE_STATE: UpdateState = {
+  messagesLength: 0,
+  isLoading: false,
+  lastMessageContent: '',
+}
+
+export function useChatManagement({ chat, onUpdateChat }: UseChatManagementProps) {
+  const lastUpdateRef = useRef<UpdateState>(DEFAULT_UPDATE_STATE)
+  const currentChatIdRef = useRef<string>(chat.id)
+
+  // Memoize initial messages to prevent unnecessary re-renders
+  const initialMessages = useMemo(() => 
+    chat.messages.map((msg) => ({
+      id: msg.id,
+      role: msg.role,
+      content: msg.content,
+    })), 
+    [chat.id] // Only re-compute when chat ID changes
+  )
+
+  const { messages, append, isLoading, setMessages } = useChat({
     api: "/api/chat",
     body: {
       model: chat.model,
     },
     id: chat.id,
-    initialMessages: chat.messages.map((msg) => ({
-      id: msg.id,
-      role: msg.role,
-      content: msg.content,
-    })),
-    onError: (error) => {
-      console.error('Chat error:', error)
-      // Try to parse the error message
-      try {
-        const errorData = JSON.parse(error.message)
-        toast.error(errorData.error || 'Failed to send message. Please try again.')
-      } catch {
-        // If it's not JSON, show the raw error or a generic message
-        if (error.message.includes('API key')) {
-          toast.error('API key not configured. Please check your environment variables.')
-        } else {
-          toast.error('Failed to send message. Please try again.')
-        }
-      }
-    },
+    initialMessages,
+    onError: handleChatError,
   })
 
-  //FIXME: This is where I assumed make the streaming bad. Need to fix soon.
-  // Debounced update function for smoother streaming
-  const debouncedUpdate = useCallback((updates: Partial<Chat>, immediate = false) => {
-    if (updateTimeoutRef.current) {
-      clearTimeout(updateTimeoutRef.current)
-    }
-
-    const performUpdate = () => {
-      onUpdateChat(chat.id, updates)
-    }
-
-    if (immediate) {
-      performUpdate()
-    } else {
-      // Debounce streaming updates slightly for better performance
-      updateTimeoutRef.current = setTimeout(performUpdate, 50)
-    }
+  // Direct update function for real-time streaming
+  const updateChat = useCallback((updates: Partial<Chat>) => {
+    onUpdateChat(chat.id, updates)
   }, [chat.id, onUpdateChat])
 
-  // Update chat when messages or loading state changes
+  // Handle chat switching with proper cleanup
   useEffect(() => {
-    const currentMessagesLength = messages.length
-    const currentIsLoading = isLoading
-    const currentLastMessageContent = messages[messages.length - 1]?.content || ''
+    const chatChanged = currentChatIdRef.current !== chat.id
     
-    const lastUpdate = lastUpdateRef.current
+    if (chatChanged) {
+      // Reset state tracking
+      lastUpdateRef.current = { ...DEFAULT_UPDATE_STATE }
+      currentChatIdRef.current = chat.id
+      
+      // Sync messages for the new chat
+      if (setMessages) {
+        setMessages(chat.messages.map((msg) => ({
+          id: msg.id,
+          role: msg.role,
+          content: msg.content,
+        })))
+      }
+    }
+  }, [chat.id, chat.messages, setMessages])
+
+  // Real-time update logic for streaming
+  useEffect(() => {
+    const currentState: UpdateState = {
+      messagesLength: messages.length,
+      isLoading,
+      lastMessageContent: messages[messages.length - 1]?.content || '',
+    }
     
-    // Only update if something meaningful has changed
-    const shouldUpdate = (
-      currentMessagesLength !== lastUpdate.messagesLength ||
-      currentIsLoading !== lastUpdate.isLoading ||
-      (currentLastMessageContent !== lastUpdate.lastMessageContent && currentLastMessageContent.length > lastUpdate.lastMessageContent.length)
-    )
+    const lastState = lastUpdateRef.current
+    
+    // More precise change detection
+    const hasNewMessages = currentState.messagesLength !== lastState.messagesLength
+    const loadingStateChanged = currentState.isLoading !== lastState.isLoading
+    const contentGrew = currentState.lastMessageContent.length > lastState.lastMessageContent.length
+    
+    const shouldUpdate = hasNewMessages || loadingStateChanged || 
+      (contentGrew && currentState.lastMessageContent !== lastState.lastMessageContent)
 
     if (shouldUpdate && messages.length > 0) {
       const updatedMessages = messages.map((msg) => ({
         id: msg.id,
-        role: msg.role as "user" | "assistant",
+        role: msg.role as "user" | "assistant", // Safe assertion since we control the input
         content: msg.content,
         timestamp: new Date(),
       }))
@@ -91,49 +104,43 @@ export function useChatManagement({ chat, onUpdateChat }: UseChatManagementProps
         isStreaming: isLoading,
       }
 
-      // Update title if it's still "New Chat" and we have a user message
-      if (chat.title === "New Chat" && messages.length >= 1 && messages[0].role === "user") {
-        const title = messages[0].content.slice(0, 50) + (messages[0].content.length > 50 ? "..." : "")
-        updates.title = title
+      // Auto-generate title for new chats
+      if (chat.title === "New Chat" && hasNewMessages) {
+        updates.title = generateChatTitle(updatedMessages)
       }
 
-      // Use immediate update for new messages, debounced for streaming updates
-      const immediate = currentMessagesLength !== lastUpdate.messagesLength || currentIsLoading !== lastUpdate.isLoading
-      debouncedUpdate(updates, immediate)
+      // Direct update for real-time streaming
+      updateChat(updates)
 
-      // Update our tracking reference
-      lastUpdateRef.current = {
-        messagesLength: currentMessagesLength,
-        isLoading: currentIsLoading,
-        lastMessageContent: currentLastMessageContent,
-      }
-    } else if (chat.isStreaming !== isLoading && messages.length === 0) {
-      // Only update streaming status if it changed and we have no messages yet
-      debouncedUpdate({ isStreaming: isLoading }, true)
-      lastUpdateRef.current.isLoading = isLoading
+      // Update tracking state
+      lastUpdateRef.current = currentState
+    } 
+    // Handle edge case: streaming status change with no messages
+    else if (chat.isStreaming !== isLoading && messages.length === 0) {
+      updateChat({ isStreaming: isLoading })
+      lastUpdateRef.current = { ...lastUpdateRef.current, isLoading }
     }
-  }, [messages, isLoading, chat.id, chat.title, chat.isStreaming, debouncedUpdate])
+  }, [messages, isLoading, chat.title, chat.isStreaming, updateChat])
 
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (updateTimeoutRef.current) {
-        clearTimeout(updateTimeoutRef.current)
-      }
+  // Improved sendMessage with better error handling
+  const sendMessage = useCallback(async (content: string) => {
+    const validation = validateMessageContent(content)
+    if (!validation.isValid) {
+      toast.error(validation.error!)
+      return
     }
-  }, [])
 
-  const sendMessage = async (content: string) => {
     try {
       await append({
         role: "user",
-        content,
+        content: content.trim(),
       })
     } catch (error) {
-      toast.error("Failed to send message. Please try again.")
+      // Error is already handled by the onError callback
+      // Re-throw to allow caller to handle if needed
       throw error
     }
-  }
+  }, [append])
 
   return {
     messages,

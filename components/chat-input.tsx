@@ -58,6 +58,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                 <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
                     <div className="relative bg-accent rounded-2xl opacity-95">
                         <Textarea
+                            autoFocus
                             ref={textareaRef}
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
