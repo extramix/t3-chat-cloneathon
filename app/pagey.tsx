@@ -72,7 +72,6 @@ export default function HomePage() {
 
     setChats((prev) => [newChat, ...prev])
     setActiveChat(newChatId)
-    toast.success("New chat created")
   }, [])
 
   const updateChat = useCallback((chatId: string, updates: Partial<Chat>) => {
