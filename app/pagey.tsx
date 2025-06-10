@@ -119,7 +119,7 @@ export default function HomePage() {
         ) : (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
-              <h1 className="text-2xl font-semibold mb-4">Welcome to T3.Chat</h1>
+              <h1 className="text-2xl font-semibold mb-4">Welcome to M2.Chat</h1>
               <p className="text-muted-foreground mb-6">Start a new conversation to begin</p>
               <button
                 onClick={createNewChat}

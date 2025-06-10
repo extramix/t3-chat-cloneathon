@@ -134,7 +134,7 @@ export function Sidebar({
             <Button variant="ghost" size="sm" onClick={onToggleCollapse} className="h-8 w-8 p-0">
               <Menu className="h-4 w-4" />
             </Button>
-            <h1 className="text-lg font-semibold">T3.Chat</h1>
+            <h1 className="text-lg font-semibold">M2.Chat</h1>
           </div>
           <ThemeToggle />
         </div>
