@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic"
 
-const App = dynamic(() => import("@/app/app"), {
+const App = dynamic(() => import("@/frontend/app"), {
     ssr: false,
 })
 

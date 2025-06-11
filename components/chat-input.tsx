@@ -54,7 +54,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
         )
 
         return (
-            <div className="pb-20 sticky bottom-0">
+            <div className="pb-2 sticky bottom-0">
                 <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
                     <div className="relative bg-accent rounded-2xl opacity-95">
                         <Textarea
