@@ -32,25 +32,29 @@ export function ChatInterface({ chat, onUpdateChat }: ChatInterfaceProps) {
   }, [])
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full flex-col">
       {/* Header */}
-      <div className="border-b border-border p-4">
+      <div className="border-b border-border p-4 flex-shrink-0">
         <ModelSelector value={chat.model} onChange={handleModelChange} />
       </div>
 
       {/* Messages */}
-      <ChatMessages
-        messages={messages}
-        isLoading={isLoading}
-        onExampleClick={handleExampleClick}
-      />
+      <div className="flex-1 overflow-y-auto">
+        <ChatMessages
+          messages={messages}
+          isLoading={isLoading}
+          onExampleClick={handleExampleClick}
+        />
+      </div>
 
       {/* Input */}
-      <ChatInput
-        ref={chatInputRef}
-        onSubmit={sendMessage}
-        isLoading={isLoading}
-      />
+      <div className="flex-shrink-0">
+        <ChatInput
+          ref={chatInputRef}
+          onSubmit={sendMessage}
+          isLoading={isLoading}
+        />
+      </div>
     </div>
   )
 }

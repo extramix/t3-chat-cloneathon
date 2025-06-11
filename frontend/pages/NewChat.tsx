@@ -1,3 +1,4 @@
+import { SUPPORTED_MODELS } from "@/app/models-constants";
 import { ChatInterface } from "@/components/chat-interface";
 
 export default function NewChat() {
@@ -6,7 +7,7 @@ export default function NewChat() {
             id: "new",
             title: "New Chat",
             messages: [],
-            model: "gemini-flash",
+            model: SUPPORTED_MODELS.GEMINI_FLASH,
             createdAt: new Date(),
         }}
         onUpdateChat={() => { }}

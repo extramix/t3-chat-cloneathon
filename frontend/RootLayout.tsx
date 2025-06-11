@@ -37,7 +37,7 @@ export default function Layout() {
                 </SignedIn>
             </header>
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-                <div className="flex flex-1 overflow-hidden">
+                <div className="flex flex-1 overflow-hidden" style={{ height: 'calc(100vh - 4rem)' }}>
                     <Sidebar
                         chats={chats}
                         activeChat={activeChat}
